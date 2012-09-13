@@ -1,11 +1,7 @@
 /*jshint node: true */
 module.exports = function( grunt ) {
 
-var // modules
-	fs = require( "fs" ),
-	path = require( "path" ),
-	request = require( "request" ),
-
+var
 	// files
 	coreFiles = [
 		"jquery.ui.core.js",
