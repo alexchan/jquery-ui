@@ -207,6 +207,8 @@ grunt.registerTask( "download_docs", function() {
 });
 
 grunt.registerTask( "download_themes", function() {
+	var fs = require( "fs" ),
+		request = require( "request" );
 	// var AdmZip = require('adm-zip');
 	var done = this.async(),
 		themes = grunt.file.read( "build/themes" ).split(","),
@@ -258,6 +260,27 @@ grunt.registerTask( "copy_themes", function() {
 	files.forEach(function( fileName ) {
 		grunt.file.copy( fileName, target + fileName.replace( distFolder, "" ) );
 	});
+});
+
+grunt.registerTask( "themes2", function() {
+	var download;
+	try {
+		download = require( "download.jqueryui.com" );
+	} catch(e) {
+		throw "You need to manually install download.jqueryui.com for this task to work";
+	}
+
+	grunt.utils.async.forEach( download.themes(), function( theme, done ) {
+		// TODO replace with theme.folderName() once that produces something useful
+		var folderName = theme.name.toLowerCase().replace(/\s/, "-");
+		grunt.file.write( "dist/themes-for-real/" + folderName + "/jquery.ui.theme.css", theme.css() );
+		theme.fetchImages(function( files ) {
+			files.forEach(function( file ) {
+				grunt.file.write( "dist/themes-for-real/" + folderName + "/images/" + file.path, file.data );
+			});
+			done();
+		});
+	}, this.async() );
 });
 
 grunt.registerTask( "clean", function() {
