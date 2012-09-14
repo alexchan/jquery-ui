@@ -176,10 +176,17 @@ grunt.registerTask( "generate_themes", function() {
 		target = "dist/" + grunt.template.process( grunt.config( "files.themes" ), grunt.config() ) + "/",
 		distFolder = "dist/" + grunt.template.process( grunt.config( "files.dist" ), grunt.config() );
 	try {
-		download = require( "download.jqueryui.com" );
-	} catch(e) {
+		require.resolve( "download.jqueryui.com" );
+	} catch( e ) {
 		throw "You need to manually install download.jqueryui.com for this task to work";
 	}
+
+	// copy release files into download builder to avoid cloning again
+	grunt.file.expandFiles( distFolder + "/**" ).forEach(function( file ) {
+		grunt.file.copy( file, "node_modules/download.jqueryui.com/release/" + file.replace(/^dist/, "") );
+	});
+
+	download = require( "download.jqueryui.com" );
 
 	files = grunt.file.expandFiles( distFolder + "/themes/base/**/*" );
 	files.forEach(function( fileName ) {
